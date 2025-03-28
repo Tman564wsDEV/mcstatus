@@ -25,3 +25,5 @@ if java.getStatus():
     print(java.getPlugins())
     print(java.getSrvHost())
     print(java.getSrvPort())
+
+print(java.getResponse())
