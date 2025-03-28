@@ -11,119 +11,122 @@ class Java:
         self.server = server
         self.query = query
 
-        self.version = self.Version(self)
-        self.players = self.Players(self)
-        self.motd = self.MOTD(self)
+        self.version = self.__Version__(self)
+        self.players = self.__Players__(self)
+        self.motd = self.__MOTD__(self)
+
+        FULL_ENDPOINT = f"{MCSTATUS_JAVA}/{self.server}"
+        self.info = requests.get(FULL_ENDPOINT, params={"query": self.query}).json()
 
     def getResponse(self) -> dict:
         FULL_ENDPOINT = f"{MCSTATUS_JAVA}/{self.server}"
-        response = requests.get(
+        self.info = requests.get(
             FULL_ENDPOINT, params={"query": self.query}
         ).json()  # TODO: Add someway to check if returns nothing, then stop everything
-        return response
+        return self.info
 
     def getStatus(self) -> bool:
-        online = Java(self.server).getResponse()["online"]
+        online = self.info["online"]
         return online
 
     def getHost(self) -> str:
-        host = Java(self.server).getResponse()["host"]
+        host = self.info["host"]
         return host
 
     def getIP(self) -> str:
-        ip = Java(self.server).getResponse()["ip_address"]
+        ip = self.info["ip_address"]
         return ip
 
     def getEulaBlocked(self) -> bool:
-        eulablocked = Java(self.server).getResponse()["eula_blocked"]
+        eulablocked = self.info["eula_blocked"]
         return eulablocked
 
-    class Version:
+    class __Version__:
         def __init__(self, outer):
             self.outer = outer
 
         def getNameRaw(self) -> str:
-            nameraw = Java(self.outer.server).getResponse()["version"]["name_raw"]
+            nameraw = self.outer.info["version"]["name_raw"]
             return nameraw
 
         def getNameClean(self) -> str:
-            nameclean = Java(self.outer.server).getResponse()["version"]["name_clean"]
+            nameclean = self.outer.info["version"]["name_clean"]
             return nameclean
 
         def getNameHtml(self) -> str:
-            namehtml = Java(self.outer.server).getResponse()["version"]["name_html"]
+            namehtml = self.outer.info["version"]["name_html"]
             return namehtml
 
         def getProtocol(self) -> str:
-            protocol = Java(self.outer.server).getResponse()["version"]["protocol"]
+            protocol = self.outer.info["version"]["protocol"]
             return protocol
 
-    class Players:
+    class __Players__:
         def __init__(self, outer):
             self.outer = outer
 
         def getOnline(self) -> dict:
-            online = Java(self.outer.server).getResponse()["players"]["online"]
+            online = self.outer.info["players"]["online"]
             return online
 
         def getMax(self) -> int:
-            max = Java(self.outer.server).getResponse()["players"]["max"]
+            max = self.outer.info["players"]["max"]
             return max
 
         def getPlayers(self) -> list:
-            players = Java(self.outer.server).getResponse()["players"]["list"]
+            players = self.outer.info["players"]["list"]
             return players
 
-    class MOTD:
+    class __MOTD__:
         def __init__(self, outer):
             self.outer = outer
 
         def getRaw(self) -> str:
-            raw = Java(self.outer.server).getResponse()["motd"]["raw"]
+            raw = self.outer.info["motd"]["raw"]
             return raw
 
         def getClean(self) -> str:
-            clean = Java(self.outer.server).getResponse()["motd"]["clean"]
+            clean = self.outer.info["motd"]["clean"]
             return clean
 
         def getHtml(self) -> str:
-            html = Java(self.outer.server).getResponse()["motd"]["html"]
+            html = self.outer.info["motd"]["html"]
             return html
 
     def getIcon(self) -> Optional[bytes]:
-        iconRaw = Java(self.server).getResponse()["icon"]
+        iconRaw = self.info["icon"]
         if not iconRaw: return None
         iconData = base64.b64decode(str(iconRaw).split(",", 1)[1])
         return iconData
 
     def getIconRaw(self) -> str:
-        iconRaw = Java(self.server).getResponse()["icon"]
+        iconRaw = self.info["icon"]
         return iconRaw
 
     # TODO: getMods may return empty list if the server is not forge, or no mods or if query was not turned on
     def getMods(self) -> list:
-        mods = Java(self.server).getResponse()["mods"]
+        mods = self.info["mods"]
         return mods
 
     # TODO: getSoftware may return None if query was not turned on
     def getSoftware(self) -> str:
-        software = Java(self.server).getResponse()["software"]
+        software = self.info["software"]
 
     # TODO: getPlugins may return an empty list if no plugins on server
     def getPlugins(self) -> list:
-        plugins = Java(self.server).getResponse()["plugins"]
+        plugins = self.info["plugins"]
         return plugins
 
     # TODO: getSrvHost may return None if no srv record could be found
     def getSrvHost(self) -> Optional[str]:
-        srv = Java(self.server).getResponse()["srv_record"]
+        srv = self.info["srv_record"]
         if not srv: return None
         host = srv["host"]
         return host
 
     # TODO: getSrvPort may return None if no srv record could be found
     def getSrvPort(self) -> Optional[int]:
-        srv = Java(self.server).getResponse()["srv_record"]
+        srv = self.info["srv_record"]
         if not srv: return None
         port = srv["port"]
         return port
