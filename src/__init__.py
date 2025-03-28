@@ -1,5 +1,6 @@
 import requests
 import base64
+from typing import Optional
 
 MCSTATUS_JAVA = "https://api.mcstatus.io/v2/status/java"
 MCSTATUS_BEDROCK = "https://api.mcstatus.io/v2/status/bedrock"
@@ -89,36 +90,40 @@ class Java:
             html = Java(self.outer.server).getResponse()["motd"]["html"]
             return html
 
-    # TODO: Add a check to see if an icon exists, if so return it, if not return None
-    def getIcon(self) -> bytes:
-        iconRaw = Java(self.outer.server).getResponse()["icon"]
+    def getIcon(self) -> Optional[bytes]:
+        iconRaw = Java(self.server).getResponse()["icon"]
+        if not iconRaw: return None
         iconData = base64.b64decode(str(iconRaw).split(",", 1)[1])
         return iconData
 
     def getIconRaw(self) -> str:
-        iconRaw = Java(self.outer.server).getResponse()["icon"]
+        iconRaw = Java(self.server).getResponse()["icon"]
         return iconRaw
 
     # TODO: getMods may return empty list if the server is not forge, or no mods or if query was not turned on
     def getMods(self) -> list:
-        mods = Java(self.outer.server).getResponse()["mods"]
+        mods = Java(self.server).getResponse()["mods"]
         return mods
 
     # TODO: getSoftware may return None if query was not turned on
     def getSoftware(self) -> str:
-        software = Java(self.outer.server).getResponse()["software"]
+        software = Java(self.server).getResponse()["software"]
 
     # TODO: getPlugins may return an empty list if no plugins on server
     def getPlugins(self) -> list:
-        plugins = Java(self.outer.server).getResponse()["plugins"]
+        plugins = Java(self.server).getResponse()["plugins"]
         return plugins
 
     # TODO: getSrvHost may return None if no srv record could be found
-    def getSrvHost(self) -> str:
-        host = Java(self.outer.server).getResponse()["srv_record"]["host"]
+    def getSrvHost(self) -> Optional[str]:
+        srv = Java(self.server).getResponse()["srv_record"]
+        if not srv: return None
+        host = srv["host"]
         return host
 
     # TODO: getSrvPort may return None if no srv record could be found
-    def getSrvPort(self) -> int:
-        port = Java(self.outer.server).getResponse()["srv_record"]["port"]
+    def getSrvPort(self) -> Optional[int]:
+        srv = Java(self.server).getResponse()["srv_record"]
+        if not srv: return None
+        port = srv["port"]
         return port
