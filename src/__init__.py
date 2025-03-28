@@ -33,6 +33,10 @@ class Java:
         host = self.info["host"]
         return host
 
+    def getPort(self) -> int:
+        port = self.info["port"]
+        return port
+
     def getIP(self) -> str:
         ip = self.info["ip_address"]
         return ip
@@ -40,6 +44,14 @@ class Java:
     def getEulaBlocked(self) -> bool:
         eulablocked = self.info["eula_blocked"]
         return eulablocked
+    
+    def getUnixRetrievedAt(self) -> int:
+        unixRetrievedAt = self.info["retrieved_at"]
+        return unixRetrievedAt
+    
+    def getUnixExpiresAt(self) -> int:
+        unixExpiresAt = self.info["expires_at"]
+        return unixExpiresAt
 
     class __Version__:
         def __init__(self, outer):
